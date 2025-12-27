@@ -16,10 +16,10 @@ export default function Header() {
             About
           </Link>
           <Link href="/movies" className="hover:text-white transition">
-            Movies
+            Browse
           </Link>
           <Link href="/ticket-rate" className="hover:text-white transition">
-            Ticket Rate
+            My Bookings
           </Link>
         </nav>
 
