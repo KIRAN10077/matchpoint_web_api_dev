@@ -5,7 +5,7 @@ export default function LoginPage() {
   return (
     <main className="relative h-screen w-screen overflow-hidden">
       <Image
-        src="/background.jpg"
+        src="/bg_image.jpg"
         alt="Login background"
         fill
         priority
