@@ -5,7 +5,7 @@ export default function Home() {
     <main className="relative h-screen w-full overflow-hidden">
       {/* Background image */}
       <Image
-        src="/background.jpg"
+        src="/bg_image.jpg"
         alt="Cineflix hero background"
         fill
         priority
