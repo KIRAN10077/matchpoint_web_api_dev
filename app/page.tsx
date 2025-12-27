@@ -6,7 +6,7 @@ export default function Home() {
       {/* Background image */}
       <Image
         src="/bg_image.jpg"
-        alt="Cineflix hero background"
+        alt="MatchPoint hero background"
         fill
         priority
         className="object-cover"
