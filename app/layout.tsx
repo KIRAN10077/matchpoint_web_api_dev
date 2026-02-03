@@ -1,5 +1,5 @@
 import "./globals.css";
-import Header from "./(auth)/_components/Header";
+import Header from "./(navigation)/Header";
 
 export default function RootLayout({
   children,
@@ -8,9 +8,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-black text-white">
+      <body suppressHydrationWarning className="min-h-screen bg-black text-white">
         <Header />
-        {children}
+        {/* push content below fixed header */}
+        <div className="pt-20">{children}</div>
       </body>
     </html>
   );
