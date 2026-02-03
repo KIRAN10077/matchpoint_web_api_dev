@@ -3,13 +3,15 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useTransition } from "react";
+import { useTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RegisterData, registerSchema } from "../schema";
 import { handleRegister } from "@/lib/actions/auth-actions";
 
 export default function RegisterForm() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const {
     register,
@@ -33,83 +35,155 @@ export default function RegisterForm() {
     });
   };
 
+  const disabled = isSubmitting || pending;
+
   return (
-    <form onSubmit={handleSubmit(submit)} className="space-y-4">
-      <div className="space-y-1">
-        <label className="text-sm font-medium" htmlFor="name">
-          Name
+    <form onSubmit={handleSubmit(submit)} className="space-y-5">
+      {/* Name */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-white/90" htmlFor="name">
+          Full name
         </label>
+
         <input
           id="name"
-          className="h-10 w-full rounded-md border border-black/10 dark:border-white/15 bg-background px-3 text-sm outline-none focus:border-foreground/40"
-          {...register("name")}
           placeholder="Your name"
+          className={[
+            "h-11 w-full rounded-lg border px-3 text-sm outline-none transition",
+            "bg-white/10 text-white placeholder:text-white/50",
+            "focus:bg-white/15",
+            errors.name
+              ? "border-red-500/70 focus:border-red-500"
+              : "border-white/15 focus:border-white/35",
+          ].join(" ")}
+          {...register("name")}
         />
+
         {errors.name?.message && (
-          <p className="text-xs text-red-600">{errors.name.message}</p>
+          <p className="text-xs text-red-400">{errors.name.message}</p>
         )}
       </div>
 
-      <div className="space-y-1">
-        <label className="text-sm font-medium" htmlFor="email">
-          Email
+      {/* Email */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-white/90" htmlFor="email">
+          Email address
         </label>
+
         <input
           id="email"
           type="email"
           autoComplete="email"
-          className="h-10 w-full rounded-md border border-black/10 dark:border-white/15 bg-background px-3 text-sm outline-none focus:border-foreground/40"
-          {...register("email")}
           placeholder="you@example.com"
+          className={[
+            "h-11 w-full rounded-lg border px-3 text-sm outline-none transition",
+            "bg-white/10 text-white placeholder:text-white/50",
+            "focus:bg-white/15",
+            errors.email
+              ? "border-red-500/70 focus:border-red-500"
+              : "border-white/15 focus:border-white/35",
+          ].join(" ")}
+          {...register("email")}
         />
+
         {errors.email?.message && (
-          <p className="text-xs text-red-600">{errors.email.message}</p>
+          <p className="text-xs text-red-400">{errors.email.message}</p>
         )}
       </div>
 
-      <div className="space-y-1">
-        <label className="text-sm font-medium" htmlFor="password">
+      {/* Password */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-white/90" htmlFor="password">
           Password
         </label>
-        <input
-          id="password"
-          type="password"
-          className="h-10 w-full rounded-md border border-black/10 dark:border-white/15 bg-background px-3 text-sm outline-none focus:border-foreground/40"
-          {...register("password")}
-          placeholder="••••••"
-        />
+
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••••"
+            className={[
+              "h-11 w-full rounded-lg border px-3 pr-12 text-sm outline-none transition",
+              "bg-white/10 text-white placeholder:text-white/50",
+              "focus:bg-white/15",
+              errors.password
+                ? "border-red-500/70 focus:border-red-500"
+                : "border-white/15 focus:border-white/35",
+            ].join(" ")}
+            {...register("password")}
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-xs text-white/70 hover:bg-white/10 hover:text-white"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
+
         {errors.password?.message && (
-          <p className="text-xs text-red-600">{errors.password.message}</p>
+          <p className="text-xs text-red-400">{errors.password.message}</p>
         )}
       </div>
 
-      <div className="space-y-1">
-        <label className="text-sm font-medium" htmlFor="confirmPassword">
-          Confirm Password
+      {/* Confirm Password */}
+      <div className="space-y-2">
+        <label
+          className="text-sm font-medium text-white/90"
+          htmlFor="confirmPassword"
+        >
+          Confirm password
         </label>
-        <input
-          id="confirmPassword"
-          type="password"
-          className="h-10 w-full rounded-md border border-black/10 dark:border-white/15 bg-background px-3 text-sm outline-none focus:border-foreground/40"
-          {...register("confirmPassword")}
-          placeholder="••••••"
-        />
+
+        <div className="relative">
+          <input
+            id="confirmPassword"
+            type={showConfirm ? "text" : "password"}
+            placeholder="••••••••"
+            className={[
+              "h-11 w-full rounded-lg border px-3 pr-12 text-sm outline-none transition",
+              "bg-white/10 text-white placeholder:text-white/50",
+              "focus:bg-white/15",
+              errors.confirmPassword
+                ? "border-red-500/70 focus:border-red-500"
+                : "border-white/15 focus:border-white/35",
+            ].join(" ")}
+            {...register("confirmPassword")}
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowConfirm((v) => !v)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-xs text-white/70 hover:bg-white/10 hover:text-white"
+            aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
+          >
+            {showConfirm ? "Hide" : "Show"}
+          </button>
+        </div>
+
         {errors.confirmPassword?.message && (
-          <p className="text-xs text-red-600">{errors.confirmPassword.message}</p>
+          <p className="text-xs text-red-400">{errors.confirmPassword.message}</p>
         )}
       </div>
 
+      {/* Submit */}
       <button
         type="submit"
-        disabled={isSubmitting || pending}
-        className="h-10 w-full rounded-md bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-60"
+        disabled={disabled}
+        className={[
+          "h-11 w-full rounded-lg text-sm font-semibold transition",
+          "bg-white text-black hover:opacity-90",
+          "disabled:opacity-60 disabled:cursor-not-allowed",
+        ].join(" ")}
       >
-        {isSubmitting || pending ? "Creating account..." : "Create account"}
+        {disabled ? "Creating account..." : "Create account"}
       </button>
 
-      <div className="mt-1 text-center text-sm">
+      <div className="pt-1 text-center text-sm text-white/70">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold hover:underline">
+        <Link href="/login" className="font-semibold text-white hover:underline">
           Log in
         </Link>
       </div>
