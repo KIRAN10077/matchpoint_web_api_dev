@@ -12,10 +12,13 @@ type UserRow = {
   createdAt?: string;
 };
 
+const USERS_PER_PAGE = 5;
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchUsers = async () => {
     setError("");
@@ -23,6 +26,7 @@ export default function AdminUsersPage() {
     try {
       const res = await axiosInstance.get("/api/admin/users");
       setUsers(res.data?.data ?? []);
+      setCurrentPage(1); // Reset to first page on refresh
     } catch (err: unknown) {
       // @ts-expect-error - axios error shape
       const serverMsg = err?.response?.data?.message;
@@ -37,6 +41,18 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(users.length / USERS_PER_PAGE);
+  const startIndex = (currentPage - 1) * USERS_PER_PAGE;
+  const endIndex = startIndex + USERS_PER_PAGE;
+  const currentUsers = users.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div>
@@ -95,14 +111,14 @@ export default function AdminUsersPage() {
               </thead>
 
               <tbody className="divide-y divide-black/5">
-                {users.length === 0 ? (
+                {currentUsers.length === 0 ? (
                   <tr>
                     <td className="px-5 py-6 text-gray-600" colSpan={5}>
                       No users found.
                     </td>
                   </tr>
                 ) : (
-                  users.map((u) => (
+                  currentUsers.map((u) => (
                     <tr key={u._id} className="hover:bg-gray-50/70">
                       <td className="px-5 py-4 font-mono text-xs text-gray-600">
                         {u._id}
@@ -147,6 +163,51 @@ export default function AdminUsersPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between border-t border-black/10 bg-gray-50 px-5 py-4">
+              <div className="text-sm text-gray-600">
+                Showing <span className="font-semibold">{startIndex + 1}</span> to{" "}
+                <span className="font-semibold">{Math.min(endIndex, users.length)}</span> of{" "}
+                <span className="font-semibold">{users.length}</span> users
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Previous
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => goToPage(page)}
+                      className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                        currentPage === page
+                          ? "bg-teal-800 text-white"
+                          : "border border-black/10 bg-white text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       ) : null}
     </div>
